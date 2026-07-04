@@ -1,65 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <title>MarKor ESP Programmer</title>
-
 <style>
-body{font-family:Arial;background:#111827;color:#fff;margin:0}
-header{background:#1f2937;padding:20px;font-size:42px;font-weight:bold}
-.card{margin:30px;background:#1f2937;border-radius:18px;padding:25px}
-button{background:#3b82f6;color:#fff;border:0;padding:14px 28px;border-radius:10px;font-size:18px;cursor:pointer;margin:5px}
-button:hover{background:#2563eb}
-pre{background:#000;color:#7CFC90;padding:15px;border-radius:10px;overflow:auto;white-space:pre-wrap}
+body{
+    font-family:Arial,sans-serif;
+    max-width:900px;
+    margin:40px auto;
+}
+button{
+    margin-left:10px;
+}
+#files div{
+    margin:8px 0;
+}
 </style>
 </head>
-
 <body>
 
-<header>MarKor ESP Programmer</header>
+<h1>MarKor ESP Programmer</h1>
 
-<div class="card">
-<h2>Status API</h2>
-<button onclick="health()">Sprawdź API</button>
-<pre id="health"></pre>
+<h2>Firmware</h2>
+
+<div id="files">
+Ładowanie...
 </div>
 
-<div class="card">
-<h2>Informacje o ESP</h2>
-<button onclick="deviceInfo()">Pobierz informacje</button>
-<pre id="device"></pre>
-</div>
-
-<script>
-async function health(){
- let r=await fetch("/health");
- document.getElementById("health").textContent=
- JSON.stringify(await r.json(),null,2);
-}
-
-async function deviceInfo(){
-
- document.getElementById("device").textContent="Ładowanie...";
-
- let r=await fetch("/device_info");
- let job=await r.json();
-
- while(true){
-
-   await new Promise(x=>setTimeout(x,1000));
-
-   let s=await fetch("/jobs/"+job.job_id);
-   let d=await s.json();
-
-   if(d.status=="finished"){
-      document.getElementById("device").textContent=d.result.stdout;
-      break;
-   }
-
- }
-
-}
-</script>
+<script src="/static/app.js"></script>
 
 </body>
 </html>
