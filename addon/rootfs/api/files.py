@@ -6,14 +6,29 @@ router = APIRouter()
 UPLOAD_DIR = Path("/data/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-ESPHOME_BUILD = Path("/share/markor")
+
+def scan_uploads():
+    result = []
+
+    for f in sorted(UPLOAD_DIR.glob("*.bin")):
+        result.append(
+            {
+                "name": f.name,
+                "size": f.stat().st_size,
+                "source": "upload",
+                "path": str(f),
+            }
+        )
+
+    return result
 
 
 @router.post("/upload")
 async def upload(file: UploadFile = File(...)):
     dst = UPLOAD_DIR / file.filename
-    with open(dst, "wb") as f:
-        f.write(await file.read())
+
+    with open(dst, "wb") as fp:
+        fp.write(await file.read())
 
     return {
         "success": True,
@@ -24,27 +39,34 @@ async def upload(file: UploadFile = File(...)):
 
 @router.get("/files")
 def files():
-    result = []
+    return scan_uploads()
 
-    # Uploads
-    for f in sorted(UPLOAD_DIR.glob("*.bin")):
-        result.append({
-            "name": f.name,
-            "size": f.stat().st_size,
-            "source": "upload",
-            "path": str(f),
-        })
 
-    # ESPHome build
-    if ESPHOME_BUILD.exists():
-        for fw in sorted(ESPHOME_BUILD.glob("*/.pioenvs/*/firmware*.bin")):
-            device = fw.parents[2].name
+@router.get("/files/{filename}")
+def file_info(filename: str):
+    file = UPLOAD_DIR / filename
 
-            result.append({
-                "name": f"{device}/{fw.name}",
-                "size": fw.stat().st_size,
-                "source": "esphome",
-                "path": str(fw),
-            })
+    if not file.exists():
+        return {"success": False}
 
-    return sorted(result, key=lambda x: (x["source"], x["name"]))
+    return {
+        "success": True,
+        "name": file.name,
+        "size": file.stat().st_size,
+        "path": str(file),
+    }
+
+
+@router.delete("/files/{filename}")
+def delete_file(filename: str):
+    file = UPLOAD_DIR / filename
+
+    if not file.exists():
+        return {"success": False}
+
+    file.unlink()
+
+    return {
+        "success": True,
+        "deleted": filename,
+    }
