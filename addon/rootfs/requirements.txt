@@ -2,3 +2,4 @@ esptool
 fastapi
 uvicorn
 python-multipart
+jinja2

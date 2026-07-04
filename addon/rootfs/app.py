@@ -1,4 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from routes import router as core_router
 from api.files import router as files_router
@@ -17,18 +20,25 @@ app = FastAPI(
     title="MarKor ESP Programmer",
     description="Remote ESP8266 / ESP32 Programmer for Home Assistant",
     version="0.1.0",
-    docs_url="/docs",
-    redoc_url="/redoc",
-    openapi_url="/openapi.json",
 )
+
+templates = Jinja2Templates(directory="/templates")
+
+app.mount("/static", StaticFiles(directory="/static"), name="static")
+
+
+@app.get("/ui", response_class=HTMLResponse)
+async def ui(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+    )
+
 
 app.include_router(core_router)
 app.include_router(files_router)
 app.include_router(flash_router)
-
 app.include_router(backup_router)
-
-
 app.include_router(jobs_router)
 app.include_router(device_router)
 app.include_router(logs_router)
