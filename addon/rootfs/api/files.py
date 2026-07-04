@@ -6,7 +6,7 @@ router = APIRouter()
 UPLOAD_DIR = Path("/data/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-ESPHOME_BUILD = Path("/data/build")
+ESPHOME_BUILD = Path("/share/markor")
 
 
 @router.post("/upload")
