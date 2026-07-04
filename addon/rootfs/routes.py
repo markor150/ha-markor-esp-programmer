@@ -33,3 +33,18 @@ def flash(req: FlashRequest):
         "0x0",
         req.firmware,
     )
+
+
+@router.get("/chip_info")
+def chip_info():
+    return run_esptool("chip_id")
+
+
+@router.get("/mac")
+def mac():
+    return run_esptool("read_mac")
+
+
+@router.post("/erase")
+def erase():
+    return run_esptool("erase_flash")
