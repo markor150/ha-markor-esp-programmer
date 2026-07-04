@@ -5,14 +5,12 @@ RUN apk add --no-cache \
     python3 \
     py3-pip
 
-RUN pip3 install --break-system-packages \
-    esptool \
-    fastapi \
-    uvicorn \
-    python-multipart
-
 COPY rootfs/requirements.txt /requirements.txt
+
 RUN pip3 install --break-system-packages -r /requirements.txt
 
-COPY rootfs /
+COPY rootfs/ /
 
+WORKDIR /
+
+CMD ["uvicorn","app:app","--host","0.0.0.0","--port","8099"]
