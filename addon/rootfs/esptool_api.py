@@ -1,9 +1,10 @@
 import subprocess
-from core.logs import add
+
 from config import get_config
 
 
-def run_esptool(*args):
+def run_esptool(*args, callback=None):
+
     cfg = get_config()
 
     cmd = [
@@ -15,22 +16,29 @@ def run_esptool(*args):
         *args,
     ]
 
-    r = subprocess.run(
+    process = subprocess.Popen(
         cmd,
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         text=True,
+        bufsize=1,
     )
 
-    for line in r.stdout.splitlines():
-        add("current", line)
+    output = []
 
-    for line in r.stderr.splitlines():
-        add("current", line)
+    for line in process.stdout:
+        line = line.rstrip()
+        output.append(line)
+
+        if callback:
+            callback(line)
+
+    process.wait()
 
     return {
         "host": cfg["host"],
         "port": cfg["port"],
-        "returncode": r.returncode,
-        "stdout": r.stdout,
-        "stderr": r.stderr,
+        "returncode": process.returncode,
+        "stdout": "\n".join(output),
+        "stderr": "",
     }
