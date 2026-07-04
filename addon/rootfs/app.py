@@ -1,15 +1,30 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from pathlib import Path
 import subprocess
 
 HOST = "192.168.1.126"
 PORT = 3333
+
+FIRMWARE_DIRS = [
+    "/config/esphome/build",
+    "/config/esphome",
+]
 
 app = FastAPI()
 
 
 class FlashRequest(BaseModel):
     firmware: str
+
+
+def find_firmwares():
+    files = []
+    for directory in FIRMWARE_DIRS:
+        p = Path(directory)
+        if p.exists():
+            files.extend(p.rglob("*.bin"))
+    return sorted(str(f) for f in files)
 
 
 def run_esptool(*args):
@@ -40,6 +55,15 @@ def root():
     return {"status": "ok", "name": "MarKor ESP Programmer"}
 
 
+@app.get("/firmwares")
+def firmwares():
+    files = find_firmwares()
+    return {
+        "count": len(files),
+        "files": files,
+    }
+
+
 @app.get("/flash_id")
 def flash_id():
     return run_esptool("flash-id")
@@ -52,11 +76,18 @@ def erase():
 
 @app.post("/flash")
 def flash(req: FlashRequest):
+    if not Path(req.firmware).exists():
+        return {
+            "error": "Firmware not found",
+            "path": req.firmware,
+        }
+
     return run_esptool(
         "write-flash",
         "0x0",
         req.firmware,
     )
+
 
 if __name__ == "__main__":
     import uvicorn
