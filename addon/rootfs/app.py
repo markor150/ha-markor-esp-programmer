@@ -1,28 +1,59 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 import subprocess
+
+HOST = "192.168.1.126"
+PORT = 3333
 
 app = FastAPI()
 
-HOST="192.168.1.126"
-PORT=3333
 
-@app.get("/flash_id")
-def flash_id():
-    cmd=[
-        "python3","-m","esptool",
+class FlashRequest(BaseModel):
+    firmware: str
+
+
+def run_esptool(*args):
+    cmd = [
+        "python3",
+        "-m",
+        "esptool",
         "--port",
         f"rfc2217://{HOST}:{PORT}",
-        "flash-id"
+        *args,
     ]
 
-    r=subprocess.run(
+    r = subprocess.run(
         cmd,
         capture_output=True,
-        text=True
+        text=True,
     )
 
     return {
-        "returncode":r.returncode,
-        "stdout":r.stdout,
-        "stderr":r.stderr
+        "returncode": r.returncode,
+        "stdout": r.stdout,
+        "stderr": r.stderr,
     }
+
+
+@app.get("/")
+def root():
+    return {"status": "ok", "name": "MarKor ESP Programmer"}
+
+
+@app.get("/flash_id")
+def flash_id():
+    return run_esptool("flash-id")
+
+
+@app.get("/erase")
+def erase():
+    return run_esptool("erase-flash")
+
+
+@app.post("/flash")
+def flash(req: FlashRequest):
+    return run_esptool(
+        "write-flash",
+        "0x0",
+        req.firmware,
+    )
