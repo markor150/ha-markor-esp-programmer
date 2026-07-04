@@ -17,18 +17,3 @@ def health():
         "status": "healthy"
     }
 
-@router.get("/flash_id")
-def flash_id():
-    return run_esptool("flash-id")
-
-
-@router.get("/chip_info")
-def chip_info():
-    return run_esptool("chip_id")
-
-
-@router.get("/mac")
-def mac():
-    return run_esptool("read_mac")
-
-
