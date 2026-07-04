@@ -8,7 +8,8 @@ RUN apk add --no-cache \
 RUN pip3 install --break-system-packages \
     esptool \
     fastapi \
-    uvicorn
+    uvicorn \
+    python-multipart
 
 COPY rootfs /
 
