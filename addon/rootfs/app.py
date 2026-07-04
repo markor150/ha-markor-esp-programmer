@@ -13,7 +13,14 @@ from api.device_info import router as device_info_router
 from api.programmers import router as programmers_router
 from api.backup import router as backup_router
 
-app = FastAPI(title="MarKor ESP Programmer")
+app = FastAPI(
+    title="MarKor ESP Programmer",
+    description="Remote ESP8266 / ESP32 Programmer for Home Assistant",
+    version="0.1.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
+)
 
 app.include_router(core_router)
 app.include_router(files_router)
