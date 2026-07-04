@@ -5,6 +5,7 @@ from api.files import router as files_router
 from api.flash import router as flash_router
 from api.jobs import router as jobs_router
 from api.device import router as device_router
+from api.logs import router as logs_router
 from api.backup import router as backup_router
 
 app = FastAPI(title="MarKor ESP Programmer")

@@ -1,4 +1,5 @@
 import subprocess
+from core.logs import add
 from config import get_config
 
 
@@ -19,6 +20,12 @@ def run_esptool(*args):
         capture_output=True,
         text=True,
     )
+
+    for line in r.stdout.splitlines():
+        add("current", line)
+
+    for line in r.stderr.splitlines():
+        add("current", line)
 
     return {
         "host": cfg["host"],
