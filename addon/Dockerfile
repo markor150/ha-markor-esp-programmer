@@ -1,8 +1,12 @@
-ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base-python:3.13
-
+ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-RUN pip install esptool fastapi uvicorn
+RUN apk add --no-cache python3 py3-pip
+
+RUN pip3 install --break-system-packages \
+    esptool \
+    fastapi \
+    uvicorn
 
 COPY rootfs /
 
