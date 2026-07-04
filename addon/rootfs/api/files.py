@@ -70,3 +70,12 @@ def delete_file(filename: str):
         "success": True,
         "deleted": filename,
     }
+
+
+@router.post("/files/refresh")
+def refresh():
+    return {
+        "success": True,
+        "count": len(scan_uploads()),
+        "files": scan_uploads(),
+    }
