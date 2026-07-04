@@ -12,4 +12,3 @@ RUN pip3 install --break-system-packages \
 
 COPY rootfs /
 
-CMD ["python3","/app.py"]
