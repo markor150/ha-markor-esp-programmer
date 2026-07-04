@@ -1,11 +1,15 @@
 from pathlib import Path
 
+from firmware.models import FirmwareFile
+from firmware.provider import FirmwareProvider
+
 
 UPLOAD_DIR = Path("/data/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
-class UploadProvider:
+class UploadProvider(FirmwareProvider):
+
     source = "upload"
 
     def scan(self):
@@ -13,12 +17,12 @@ class UploadProvider:
 
         for file in sorted(UPLOAD_DIR.glob("*.bin")):
             result.append(
-                {
-                    "name": file.name,
-                    "size": file.stat().st_size,
-                    "source": self.source,
-                    "path": str(file),
-                }
+                FirmwareFile(
+                    name=file.name,
+                    path=str(file),
+                    size=file.stat().st_size,
+                    source=self.source,
+                ).__dict__
             )
 
         return result
