@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from pathlib import Path
+
+from fastapi import APIRouter, UploadFile, File
 from models import FlashRequest
 from esptool_api import run_esptool
 
@@ -48,3 +50,33 @@ def mac():
 @router.post("/erase")
 def erase():
     return run_esptool("erase_flash")
+
+
+UPLOAD_DIR = Path("/data/uploads")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+@router.post("/upload")
+async def upload(file: UploadFile = File(...)):
+    dst = UPLOAD_DIR / file.filename
+    with open(dst, "wb") as f:
+        f.write(await file.read())
+
+    return {
+        "success": True,
+        "filename": file.filename,
+        "size": dst.stat().st_size,
+    }
+
+
+@router.get("/files")
+def files():
+    return sorted(
+        [
+            {
+                "name": f.name,
+                "size": f.stat().st_size,
+            }
+            for f in UPLOAD_DIR.glob("*.bin")
+        ],
+        key=lambda x: x["name"],
+    )
