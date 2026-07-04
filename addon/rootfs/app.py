@@ -27,3 +27,13 @@ app.include_router(files_router)
 app.include_router(flash_router)
 
 app.include_router(backup_router)
+
+
+app.include_router(jobs_router)
+app.include_router(device_router)
+app.include_router(logs_router)
+app.include_router(progress_router)
+app.include_router(detect_router)
+app.include_router(read_flash_router)
+app.include_router(device_info_router)
+app.include_router(programmers_router)
