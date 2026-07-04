@@ -1,26 +1,15 @@
 from pathlib import Path
+
 from fastapi import APIRouter, UploadFile, File
+
+from firmware.manager import FirmwareManager
 
 router = APIRouter()
 
 UPLOAD_DIR = Path("/data/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-
-def scan_uploads():
-    result = []
-
-    for f in sorted(UPLOAD_DIR.glob("*.bin")):
-        result.append(
-            {
-                "name": f.name,
-                "size": f.stat().st_size,
-                "source": "upload",
-                "path": str(f),
-            }
-        )
-
-    return result
+manager = FirmwareManager()
 
 
 @router.post("/upload")
@@ -39,7 +28,7 @@ async def upload(file: UploadFile = File(...)):
 
 @router.get("/files")
 def files():
-    return scan_uploads()
+    return manager.scan()
 
 
 @router.get("/files/{filename}")
@@ -76,6 +65,6 @@ def delete_file(filename: str):
 def refresh():
     return {
         "success": True,
-        "count": len(scan_uploads()),
-        "files": scan_uploads(),
+        "count": len(manager.scan()),
+        "files": manager.scan(),
     }
