@@ -1,0 +1,12 @@
+{
+  "domain": "markor_esp",
+  "name": "MarKor ESP Programmer",
+  "version": "0.0.1",
+  "documentation": "https://github.com/markor150/ha-markor-esp-programmer",
+  "issue_tracker": "https://github.com/markor150/ha-markor-esp-programmer/issues",
+  "codeowners": [
+    "@markor150"
+  ],
+  "requirements": [],
+  "iot_class": "local_push"
+}
