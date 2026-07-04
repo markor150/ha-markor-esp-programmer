@@ -1,5 +1,5 @@
 name: MarKor ESP Programmer
-version: "0.0.2"
+version: "0.0.3"
 slug: markor_esp_programmer
 description: Flash ESP devices over RFC2217
 startup: services
