@@ -11,5 +11,8 @@ RUN pip3 install --break-system-packages \
     uvicorn \
     python-multipart
 
+COPY rootfs/requirements.txt /requirements.txt
+RUN pip3 install --break-system-packages -r /requirements.txt
+
 COPY rootfs /
 
