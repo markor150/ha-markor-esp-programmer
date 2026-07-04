@@ -5,47 +5,52 @@ from firmware.provider import FirmwareProvider
 
 
 SEARCH_PATHS = [
-    Path("/share/markor"),
-    Path("/config/esphome"),
-    Path("/data/build"),
+    "/share/markor",
+    "/config/esphome",
+    "/data/build",
 ]
 
 
 class ESPHomeProvider(FirmwareProvider):
+
     source = "esphome"
 
     def scan(self):
         result = []
         seen = set()
 
-        for root in SEARCH_PATHS:
+        for root_name in SEARCH_PATHS:
+            root = Path(root_name)
+
             if not root.exists():
+                print(f"[ESPHome] Missing: {root}")
                 continue
 
-            for pattern in (
-                "*.bin",
-                "*.factory.bin",
-                "firmware.bin",
-                "firmware.factory.bin",
-            ):
-                for file in root.rglob(pattern):
-                    if not file.is_file():
-                        continue
+            print(f"[ESPHome] Scanning: {root}")
 
-                    real = str(file.resolve())
+            for file in root.rglob("*.bin"):
 
-                    if real in seen:
-                        continue
+                if not file.is_file():
+                    continue
 
-                    seen.add(real)
+                real = str(file.resolve())
 
-                    result.append(
-                        FirmwareFile(
-                            name=file.name,
-                            path=real,
-                            size=file.stat().st_size,
-                            source=self.source,
-                        ).__dict__
-                    )
+                if real in seen:
+                    continue
+
+                seen.add(real)
+
+                print(f"[ESPHome] Found: {real}")
+
+                result.append(
+                    FirmwareFile(
+                        name=file.name,
+                        path=real,
+                        size=file.stat().st_size,
+                        source=self.source,
+                    ).__dict__
+                )
+
+        print(f"[ESPHome] Total firmware: {len(result)}")
 
         return result
