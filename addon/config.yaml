@@ -1,0 +1,28 @@
+name: MarKor ESP Programmer
+version: "0.0.1"
+slug: markor_esp_programmer
+description: Flash ESP devices over RFC2217
+startup: services
+boot: auto
+
+arch:
+  - amd64
+  - aarch64
+
+ports:
+  8099/tcp: 8099
+
+host_network: true
+
+init: false
+
+map:
+  - config:rw
+
+options:
+  host: 192.168.1.126
+  port: 3333
+
+schema:
+  host: str
+  port: port
