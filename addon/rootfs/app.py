@@ -1,13 +1,11 @@
 from fastapi import FastAPI
-from routes import router
 
-app = FastAPI(
-    title="MarKor Network ESP Programmer",
-    version="0.1.0"
-)
+from routes import router as core_router
+from api.files import router as files_router
+from api.flash import router as flash_router
 
-app.include_router(router)
+app = FastAPI(title="MarKor ESP Programmer")
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8099)
+app.include_router(core_router)
+app.include_router(files_router)
+app.include_router(flash_router)
